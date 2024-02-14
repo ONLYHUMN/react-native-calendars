@@ -71,6 +71,8 @@ export interface ExpandableCalendarProps extends CalendarListProps {
   closeOnDayPress?: boolean;
   /** callback that toggle date picker */
   handleDatePicker?: () => void;
+  /** calendar list ref */
+  calendarListRef?: React.Ref<any>
 }
 
 const headerStyleOverride = {
@@ -125,6 +127,7 @@ const ExpandableCalendar = (props: ExpandableCalendarProps) => {
     renderArrow,
     testID,
     handleDatePicker,
+    calendarListRef,
     ...others
   } = props;
 
@@ -202,7 +205,7 @@ const ExpandableCalendar = (props: ExpandableCalendarProps) => {
   /** Components' refs */
 
   const wrapper = useRef<any>();
-  const calendarList = useRef<any>();
+  const calendarList = calendarListRef ?? useRef<any>();
   const header = useRef<any>();
   const weekCalendarWrapper = useRef<any>();
 
