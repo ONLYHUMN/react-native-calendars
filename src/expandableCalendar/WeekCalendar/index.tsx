@@ -185,14 +185,14 @@ const WeekCalendar = (props: WeekCalendarProps) => {
         const adjustedNewDate = currItems[NUMBER_OF_PAGES - newDateOffset];
         visibleWeek.current = adjustedNewDate;
         currentIndex.current = currItems.indexOf(adjustedNewDate);
-        // setDate(adjustedNewDate, UpdateSources.WEEK_SCROLL);
+        setDate(adjustedNewDate, UpdateSources.WEEK_SCROLL);
         if (visibleWeek.current === currItems[currItems.length - 1]) {
           onEndReached();
         }
       } else {
         currentIndex.current = currItems.indexOf(newDate);
         visibleWeek.current = newDate;
-        // setDate(newDate, UpdateSources.WEEK_SCROLL);
+        setDate(newDate, UpdateSources.WEEK_SCROLL);
         if (visibleWeek.current === currItems[0]) {
           onEndReached();
         }
