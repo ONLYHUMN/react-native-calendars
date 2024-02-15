@@ -263,3 +263,5 @@ scripts/
 # *.tsx
 # # include the .d.ts files
 # !*.d.ts 
+
+__tests__
