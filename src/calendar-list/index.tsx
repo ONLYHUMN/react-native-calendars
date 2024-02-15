@@ -147,11 +147,11 @@ const CalendarList = (props: CalendarListProps & ContextProp, ref: any) => {
     });
   }, [items]);
 
-  useEffect(() => {
-    if (current) {
-      scrollToMonth(new XDate(current));
-    }
-  }, [current]);
+  // useEffect(() => {
+  //   if (current) {
+  //     scrollToMonth(new XDate(current));
+  //   }
+  // }, [current]);
 
   useDidUpdate(() => {
     const currMont = currentMonth?.clone();
@@ -197,12 +197,12 @@ const CalendarList = (props: CalendarListProps & ContextProp, ref: any) => {
   }, [calendarSize, shouldUseAndroidRTLFix, pastScrollRange, animateScroll]);
 
   const addMonth = useCallback((count: number) => {
-    const day = currentMonth?.clone().addMonths(count, true);
-    if (sameMonth(day, currentMonth) || getDateIndex(day) === -1) {
-      return;
-    }
-    scrollToMonth(day);
-    setCurrentMonth(day);
+    // const day = currentMonth?.clone().addMonths(count, true);
+    // if (sameMonth(day, currentMonth) || getDateIndex(day) === -1) {
+    //   return;
+    // }
+    // scrollToMonth(day);
+    // setCurrentMonth(day);
   }, [currentMonth, scrollToMonth]);
 
   const getMarkedDatesForItem = useCallback((item?: XDate) => {

@@ -5,7 +5,7 @@ import throttle from 'lodash/throttle';
 
 import XDate from 'xdate';
 
-import React, {useContext, useRef, useState, useEffect, useCallback, useMemo} from 'react';
+import React, {useContext, useRef, useState, useEffect, useCallback, useMemo, useImperativeHandle, forwardRef} from 'react';
 import {
   AccessibilityInfo,
   PanResponder,
@@ -98,7 +98,12 @@ const headerStyleOverride = {
  * @example: https://github.com/wix/react-native-calendars/blob/master/example/src/screens/expandableCalendar.js
  */
 
-const ExpandableCalendar = (props: ExpandableCalendarProps) => {
+const ExpandableCalendar = (props: ExpandableCalendarProps, ref: any) => {
+  useImperativeHandle(ref, () => ({
+    setDate: (date: XDate | string) => {
+      _setDate(date);
+    },
+  }));
   const {date, setDate, numberOfDays, timelineLeftInset} = useContext(Context);
   const {
     /** ExpandableCalendar props */
@@ -130,9 +135,12 @@ const ExpandableCalendar = (props: ExpandableCalendarProps) => {
     calendarListRef,
     ...others
   } = props;
-
+  
   const [screenReaderEnabled, setScreenReaderEnabled] = useState(false);
 
+  const _setDate = (date) => {
+    setDate(date, UpdateSources.DAY_PRESS)
+  }
   /** Date */
 
   const getYear = (date: string) => {
@@ -624,7 +632,7 @@ const ExpandableCalendar = (props: ExpandableCalendarProps) => {
   );
 };
 
-export default ExpandableCalendar;
+export default forwardRef(ExpandableCalendar);
 
 ExpandableCalendar.displayName = 'ExpandableCalendar';
 ExpandableCalendar.defaultProps = {
