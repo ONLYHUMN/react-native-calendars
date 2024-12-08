@@ -50,7 +50,7 @@ const BasicDay = (props: BasicDayProps) => {
   const style = useRef(styleConstructor(theme));
 
   const _marking = marking || {};
-  const isSelected = _marking.selected || state === 'selected';
+  const isSelected = _marking.selected;
   const isDisabled = typeof _marking.disabled !== 'undefined' ? _marking.disabled : state === 'disabled';
   const isInactive = typeof marking?.inactive !== 'undefined' ? marking.inactive : state === 'inactive';
   const isToday = typeof marking?.today !== 'undefined' ? marking.today : state === 'today';
@@ -75,7 +75,6 @@ const BasicDay = (props: BasicDayProps) => {
   const getContainerStyle = () => {
     const {customStyles, selectedColor} = _marking;
     const styles = [style.current.base];
-
     if (isSelected) {
       styles.push(style.current.selected);
       if (selectedColor) {

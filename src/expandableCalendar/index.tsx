@@ -69,6 +69,8 @@ export interface ExpandableCalendarProps extends CalendarListProps {
   closeThreshold?: number;
   /** Whether to close the calendar on day press. Default = true */
   closeOnDayPress?: boolean;
+  /** callback that toggle date picker */
+  handleDatePicker?: () => void;
 }
 
 const headerStyleOverride = {
@@ -122,6 +124,7 @@ const ExpandableCalendar = (props: ExpandableCalendarProps) => {
     onPressArrowRight,
     renderArrow,
     testID,
+    handleDatePicker,
     ...others
   } = props;
 
@@ -590,6 +593,7 @@ const ExpandableCalendar = (props: ExpandableCalendarProps) => {
         headerStyle={_headerStyle}
         timelineLeftInset={timelineLeftInset}
         context={useContext(Context)}
+        handleDatePicker={handleDatePicker}
       />
     );
   };

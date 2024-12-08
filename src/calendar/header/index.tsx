@@ -73,6 +73,8 @@ export interface CalendarHeaderProps {
   numberOfDays?: number;
   /** Left inset for the timeline calendar header. Default = 72 */
   timelineLeftInset?: number;
+  /** callback that toggle date picker */
+  handleDatePicker?: () => void;
 }
 
 const accessibilityActions = [
@@ -107,7 +109,8 @@ const CalendarHeader = forwardRef((props: CalendarHeaderProps, ref) => {
     importantForAccessibility,
     numberOfDays,
     current = '',
-    timelineLeftInset
+    timelineLeftInset,
+    handleDatePicker
   } = props;
   
   const numberOfDaysCondition = useMemo(() => {
@@ -209,14 +212,16 @@ const CalendarHeader = forwardRef((props: CalendarHeaderProps, ref) => {
 
     return (
       <Fragment>
-        <Text
-          allowFontScaling={false}
-          style={style.current.monthText}
-          testID={`${testID}.title`}
-          {...webProps}
-        >
-          {formatNumbers(month?.toString(monthFormat))}
-        </Text>
+        <TouchableOpacity activeOpacity={0.7} onPress={() => (handleDatePicker ? handleDatePicker() : null)}>
+          <Text
+            allowFontScaling={false}
+            style={style.current.monthText}
+            testID={`${testID}.title`}
+            {...webProps}
+          >
+            {formatNumbers(month?.toString(monthFormat))}
+          </Text>
+        </TouchableOpacity>
       </Fragment>
     );
   };

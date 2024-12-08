@@ -60,6 +60,8 @@ export interface CalendarProps extends CalendarHeaderProps, DayProps {
   disabledByWeekDays?: number[]
   /** Test ID */
   testID?: string;
+  /** callback that toggle date picker */
+  handleDatePicker?: () => void;
 }
 
 /**
