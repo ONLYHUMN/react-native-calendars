@@ -13,3 +13,4 @@ export { default as TimelineList } from './timeline-list';
 export { default as CalendarUtils } from './services';
 export { default as LocaleConfig } from 'xdate';
 export { default as Profiler } from './Profiler';
+export { default as MonthYearPicker } from './calendar/header/MonthYearPicker';
