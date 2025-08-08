@@ -98,7 +98,17 @@ export function weekDayNames(firstDayOfWeek = 0) {
     return weekDaysNames;
 }
 export function page(date, firstDayOfWeek = 0, showSixWeeks = false) {
-    const days = month(date);
+    // Guard against invalid/undefined dates to prevent runtime errors
+    const baseDate = (date && date instanceof XDate && date.valid?.()) ? date : new XDate();
+    const days = month(baseDate);
+    if (!days || days.length === 0 || !days[0] || !days[days.length - 1]) {
+        // As a final safeguard, return the current month
+        const fallbackDays = month(XDate.today());
+        if (!fallbackDays || fallbackDays.length === 0 || !fallbackDays[0]) {
+            return [];
+        }
+        return fallbackDays;
+    }
     let before = [];
     let after = [];
     const fdow = (7 + firstDayOfWeek) % 7 || 7;

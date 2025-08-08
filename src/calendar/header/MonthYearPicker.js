@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Modal, View, Text, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
 import XDate from 'xdate';
 const ITEM_HEIGHT = 40;
@@ -15,20 +15,22 @@ const MonthYearPicker = ({ visible, initialDate, onClose, onConfirm, minYear = 1
     const [selectedYear, setSelectedYear] = useState(initialDate.getFullYear());
     const monthList = useRef(null);
     const yearList = useRef(null);
+    const initialMonthIndex = useMemo(() => initialDate.getMonth(), [initialDate]);
+    const initialYearIndex = useMemo(() => years.indexOf(initialDate.getFullYear()), [years, initialDate]);
     useEffect(() => {
         setSelectedMonth(initialDate.getMonth());
         setSelectedYear(initialDate.getFullYear());
-        // Scroll to initial indices when opened
-        if (visible) {
-            setTimeout(() => {
-                monthList.current?.scrollToIndex({ index: initialDate.getMonth(), animated: false });
-                const yearIndex = years.indexOf(initialDate.getFullYear());
-                if (yearIndex >= 0) {
-                    yearList.current?.scrollToIndex({ index: yearIndex, animated: false });
-                }
-            }, 0);
-        }
-    }, [visible, initialDate, years]);
+    }, [visible, initialDate]);
+    const onMonthScrollToIndexFailed = useCallback(({ index, averageItemLength }) => {
+        const offset = Math.max(0, averageItemLength * index);
+        monthList.current?.scrollToOffset({ offset, animated: false });
+        setTimeout(() => monthList.current?.scrollToIndex({ index, animated: false }), 0);
+    }, []);
+    const onYearScrollToIndexFailed = useCallback(({ index, averageItemLength }) => {
+        const offset = Math.max(0, averageItemLength * index);
+        yearList.current?.scrollToOffset({ offset, animated: false });
+        setTimeout(() => yearList.current?.scrollToIndex({ index, animated: false }), 0);
+    }, []);
     const renderItem = (item, isSelected) => {
         return (<View style={[styles.item, isSelected && styles.itemSelected]}> 
         <Text style={[styles.itemText, isSelected && styles.itemTextSelected]} numberOfLines={1}>
@@ -43,10 +45,10 @@ const MonthYearPicker = ({ visible, initialDate, onClose, onConfirm, minYear = 1
           <View style={styles.pickersRow}>
             <FlatList ref={monthList} data={months} keyExtractor={(_, idx) => `m-${idx}`} renderItem={({ item, index }) => (<TouchableOpacity onPress={() => setSelectedMonth(index)}>
                   {renderItem(item, index === selectedMonth)}
-                </TouchableOpacity>)} getItemLayout={(_, index) => ({ length: ITEM_HEIGHT, offset: ITEM_HEIGHT * index, index })} showsVerticalScrollIndicator={false} style={styles.list}/>
+                </TouchableOpacity>)} getItemLayout={(_, index) => ({ length: ITEM_HEIGHT, offset: ITEM_HEIGHT * index, index })} showsVerticalScrollIndicator={false} initialScrollIndex={initialMonthIndex} onScrollToIndexFailed={onMonthScrollToIndexFailed} style={styles.list}/>
             <FlatList ref={yearList} data={years} keyExtractor={(item) => `y-${item}`} renderItem={({ item }) => (<TouchableOpacity onPress={() => setSelectedYear(item)}>
                   {renderItem(item, item === selectedYear)}
-                </TouchableOpacity>)} getItemLayout={(_, index) => ({ length: ITEM_HEIGHT, offset: ITEM_HEIGHT * index, index })} showsVerticalScrollIndicator={false} style={styles.list}/>
+                </TouchableOpacity>)} getItemLayout={(_, index) => ({ length: ITEM_HEIGHT, offset: ITEM_HEIGHT * index, index })} showsVerticalScrollIndicator={false} initialScrollIndex={initialYearIndex >= 0 ? initialYearIndex : 0} onScrollToIndexFailed={onYearScrollToIndexFailed} style={styles.list}/>
           </View>
           <View style={styles.actionsRow}>
             <TouchableOpacity onPress={onClose} style={[styles.button, styles.cancelButton]}>

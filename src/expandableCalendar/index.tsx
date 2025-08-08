@@ -324,6 +324,11 @@ const ExpandableCalendar = forwardRef<ExpandableCalendarRef, ExpandableCalendarP
   const scrollPage = useCallback((next: boolean, updateSource = UpdateSources.PAGE_SCROLL) => {
     if (horizontal) {
       const d = parseDate(date);
+      
+      if (!d) {
+        // If parseDate returns undefined, bail out to prevent crashes
+        return;
+      }
 
       if (isOpen) {
         d.setDate(1);

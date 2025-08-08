@@ -210,6 +210,10 @@ const ExpandableCalendar = forwardRef((props, ref) => {
     const scrollPage = useCallback((next, updateSource = UpdateSources.PAGE_SCROLL) => {
         if (horizontal) {
             const d = parseDate(date);
+            if (!d) {
+                // If parseDate returns undefined, bail out to prevent crashes
+                return;
+            }
             if (isOpen) {
                 d.setDate(1);
                 d.addMonths(next ? 1 : -1);
