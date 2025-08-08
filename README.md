@@ -43,7 +43,7 @@ $ yarn install
 
 $ cd ios && pod install && cd ..
 
-$ react-native run-ios
+$ yarn ios
 ```
 
 You can check example screens source code in [example module screens](https://github.com/wix-private/wix-react-native-calendar/tree/master/example/src/screens)
