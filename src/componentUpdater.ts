@@ -118,8 +118,6 @@ export function extractHeaderProps(props: CalendarProps) {
     onHeaderLayout,
     showPickerButton,
     titlePressOpensMonthYearPicker,
-    titleLongPressOpensMonthYearPicker,
-    onTitlePickerVisibilityChange
   } = props;
 
   const headerProps = {
@@ -147,9 +145,7 @@ export function extractHeaderProps(props: CalendarProps) {
     testID,
     onHeaderLayout,
     showPickerButton,
-    titlePressOpensMonthYearPicker,
-    titleLongPressOpensMonthYearPicker,
-    onTitlePickerVisibilityChange
+    titlePressOpensMonthYearPicker
   };
 
   return headerProps;

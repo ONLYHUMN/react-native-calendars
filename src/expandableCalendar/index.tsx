@@ -143,7 +143,6 @@ const ExpandableCalendar = forwardRef<ExpandableCalendarRef, ExpandableCalendarP
   } = props;
 
   const [screenReaderEnabled, setScreenReaderEnabled] = useState(false);
-  const [titlePickerVisible, setTitlePickerVisible] = useState(false);
   const [inlinePickerVisible, setInlinePickerVisible] = useState(false);
   const [headerHeight, setHeaderHeight] = useState(0);
   const onHeaderLayout = useCallback(({nativeEvent: {layout: {height}}}: LayoutChangeEvent) => {
@@ -352,7 +351,7 @@ const ExpandableCalendar = forwardRef<ExpandableCalendarRef, ExpandableCalendarP
   /** Pan Gesture */
 
   const handleMoveShouldSetPanResponder = (_: GestureResponderEvent, gestureState: PanResponderGestureState) => {
-    if (titlePickerVisible) {
+    if (inlinePickerVisible) {
       return false;
     }
     if (disablePan) {
