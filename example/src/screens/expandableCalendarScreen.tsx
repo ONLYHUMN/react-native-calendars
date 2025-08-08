@@ -6,17 +6,18 @@ import {agendaItems, getMarkedDates} from '../mocks/agendaItems';
 import AgendaItem from '../mocks/AgendaItem';
 import {getTheme, themeColor, lightThemeColor} from '../mocks/theme';
 import type XDate from 'xdate';
-const XDateClass = require('xdate');
+import XDateClass from 'xdate';
 import MonthYearPicker from '../../../src/calendar/header/MonthYearPicker';
 
 const leftArrowIcon = require('../img/previous.png');
 const rightArrowIcon = require('../img/next.png');
+const CHEVRON = require('../img/next.png');
+
 const ITEMS: any[] = agendaItems;
 
 interface Props {
   weekView?: boolean;
 }
-const CHEVRON = require('../img/next.png');
 const ExpandableCalendarScreen = (props: Props) => {
   const {weekView} = props;
   const marked = useRef(getMarkedDates());
