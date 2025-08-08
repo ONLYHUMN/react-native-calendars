@@ -1,4 +1,4 @@
-import React, {useEffect, useMemo, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {Modal, View, Text, StyleSheet, TouchableOpacity, FlatList} from 'react-native';
 import XDate from 'xdate';
 
@@ -37,20 +37,25 @@ const MonthYearPicker = ({
   const monthList = useRef<FlatList<string>>(null);
   const yearList = useRef<FlatList<number>>(null);
 
+  const initialMonthIndex = useMemo(() => initialDate.getMonth(), [initialDate]);
+  const initialYearIndex = useMemo(() => years.indexOf(initialDate.getFullYear()), [years, initialDate]);
+
   useEffect(() => {
     setSelectedMonth(initialDate.getMonth());
     setSelectedYear(initialDate.getFullYear());
-    // Scroll to initial indices when opened
-    if (visible) {
-      setTimeout(() => {
-        monthList.current?.scrollToIndex({index: initialDate.getMonth(), animated: false});
-        const yearIndex = years.indexOf(initialDate.getFullYear());
-        if (yearIndex >= 0) {
-          yearList.current?.scrollToIndex({index: yearIndex, animated: false});
-        }
-      }, 0);
-    }
-  }, [visible, initialDate, years]);
+  }, [visible, initialDate]);
+
+  const onMonthScrollToIndexFailed = useCallback(({index, averageItemLength}: {index: number; averageItemLength: number}) => {
+    const offset = Math.max(0, averageItemLength * index);
+    monthList.current?.scrollToOffset({offset, animated: false});
+    setTimeout(() => monthList.current?.scrollToIndex({index, animated: false}), 0);
+  }, []);
+
+  const onYearScrollToIndexFailed = useCallback(({index, averageItemLength}: {index: number; averageItemLength: number}) => {
+    const offset = Math.max(0, averageItemLength * index);
+    yearList.current?.scrollToOffset({offset, animated: false});
+    setTimeout(() => yearList.current?.scrollToIndex({index, animated: false}), 0);
+  }, []);
 
   const renderItem = (item: string | number, isSelected: boolean) => {
     return (
@@ -79,6 +84,8 @@ const MonthYearPicker = ({
               )}
               getItemLayout={(_, index) => ({length: ITEM_HEIGHT, offset: ITEM_HEIGHT * index, index})}
               showsVerticalScrollIndicator={false}
+              initialScrollIndex={initialMonthIndex}
+              onScrollToIndexFailed={onMonthScrollToIndexFailed}
               style={styles.list}
             />
             <FlatList
@@ -92,6 +99,8 @@ const MonthYearPicker = ({
               )}
               getItemLayout={(_, index) => ({length: ITEM_HEIGHT, offset: ITEM_HEIGHT * index, index})}
               showsVerticalScrollIndicator={false}
+              initialScrollIndex={initialYearIndex >= 0 ? initialYearIndex : 0}
+              onScrollToIndexFailed={onYearScrollToIndexFailed}
               style={styles.list}
             />
           </View>
