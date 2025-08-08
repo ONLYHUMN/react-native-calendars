@@ -41,6 +41,7 @@ import WeekCalendar from './WeekCalendar';
 import Context from './Context';
 import constants from '../commons/constants';
 import {UpdateSources, CalendarNavigationTypes} from './commons';
+import MonthYearPicker from '../calendar/header/MonthYearPicker';
 
 export enum Positions {
   CLOSED = 'closed',
@@ -142,6 +143,8 @@ const ExpandableCalendar = forwardRef<ExpandableCalendarRef, ExpandableCalendarP
   } = props;
 
   const [screenReaderEnabled, setScreenReaderEnabled] = useState(false);
+  const [titlePickerVisible, setTitlePickerVisible] = useState(false);
+  const [inlinePickerVisible, setInlinePickerVisible] = useState(false);
   const [headerHeight, setHeaderHeight] = useState(0);
   const onHeaderLayout = useCallback(({nativeEvent: {layout: {height}}}: LayoutChangeEvent) => {
       setHeaderHeight(height || DEFAULT_HEADER_HEIGHT);
@@ -349,6 +352,9 @@ const ExpandableCalendar = forwardRef<ExpandableCalendarRef, ExpandableCalendarP
   /** Pan Gesture */
 
   const handleMoveShouldSetPanResponder = (_: GestureResponderEvent, gestureState: PanResponderGestureState) => {
+    if (titlePickerVisible) {
+      return false;
+    }
     if (disablePan) {
       return false;
     }
@@ -552,11 +558,22 @@ const ExpandableCalendar = forwardRef<ExpandableCalendarRef, ExpandableCalendarP
       <Animated.View
         ref={header}
         style={animatedHeaderStyle}
-        pointerEvents={'none'}
+        pointerEvents={'box-none'}
       >
-        <Text allowFontScaling={false} style={style.current.headerTitle}>
-          {monthYear}
-        </Text>
+        <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}}>
+          <Text allowFontScaling={false} style={style.current.headerTitle}>
+            {monthYear}
+          </Text>
+          <TouchableOpacity
+            onPress={() => setInlinePickerVisible(true)}
+            accessibilityRole={'button'}
+            accessibilityLabel={'Open month and year picker'}
+            testID={`${testID}.animatedHeader.openPickerButton`}
+            style={{paddingHorizontal: 6, paddingVertical: 4}}
+          >
+            <Text style={{fontSize: 16}}>📅</Text>
+          </TouchableOpacity>
+        </View>
         {renderWeekDaysNames()}
       </Animated.View>
     );
@@ -622,6 +639,7 @@ const ExpandableCalendar = forwardRef<ExpandableCalendarRef, ExpandableCalendarP
         headerStyle={_headerStyle}
         timelineLeftInset={timelineLeftInset}
         context={_context}
+        showPickerButton
       />
     );
   };
@@ -644,6 +662,18 @@ const ExpandableCalendar = forwardRef<ExpandableCalendarRef, ExpandableCalendarP
           {renderWeekCalendar()}
           {!hideKnob && renderKnob()}
           {!horizontal && renderAnimatedHeader()}
+          {!horizontal && (
+            <MonthYearPicker
+              visible={inlinePickerVisible}
+              initialDate={new XDate(date)}
+              onClose={() => setInlinePickerVisible(false)}
+              onConfirm={(monthIndex, year) => {
+                const target = new XDate(year, monthIndex, 1);
+                setInlinePickerVisible(false);
+                setDate?.(toMarkingFormat(target), UpdateSources.ARROW_PRESS);
+              }}
+            />
+          )}
         </Animated.View>
       )}
     </View>

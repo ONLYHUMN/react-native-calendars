@@ -267,6 +267,8 @@ const Calendar = (props: CalendarProps & ContextProp) => {
         month={currentMonth}
         addMonth={addMonth}
         displayLoadingIndicator={shouldDisplayIndicator}
+        titlePressOpensMonthYearPicker
+        showPickerButton={false}
       />
     );
   };

@@ -276,6 +276,7 @@ const CalendarList = (props: CalendarListProps & ContextProp, ref: any) => {
           month={currentMonth}
           addMonth={addMonth}
           onHeaderLayout={onHeaderLayoutToPass}
+          showPickerButton={false}
           accessibilityElementsHidden={accessibilityElementsHidden} // iOS
           importantForAccessibility={importantForAccessibility} // Android
         />

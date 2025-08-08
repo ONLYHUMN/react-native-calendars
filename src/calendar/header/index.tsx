@@ -1,7 +1,7 @@
 import includes from 'lodash/includes';
 import XDate from 'xdate';
 
-import React, {Fragment, ReactNode, useCallback, useMemo, forwardRef, useImperativeHandle, useRef} from 'react';
+import React, {Fragment, ReactNode, useCallback, useMemo, forwardRef, useImperativeHandle, useRef, useState} from 'react';
 import {
   ActivityIndicator,
   Platform,
@@ -19,6 +19,7 @@ import {
 import {formatNumbers, weekDayNames} from '../../dateutils';
 import styleConstructor from './style';
 import {Theme, Direction} from '../../types';
+import MonthYearPicker from './MonthYearPicker';
 
 export interface CalendarHeaderProps {
   /** The current month presented in the calendar */
@@ -76,6 +77,10 @@ export interface CalendarHeaderProps {
   timelineLeftInset?: number;
   /** Callback for header onLayout */
   onHeaderLayout?: ViewProps['onLayout'];
+  /** Show a small button next to the title to open the month/year picker (used by ExpandableCalendar) */
+  showPickerButton?: boolean;
+  /** If true, tapping the title opens a month/year picker (used by non-expandable calendars) */
+  titlePressOpensMonthYearPicker?: boolean;
 }
 
 const accessibilityActions = [
@@ -118,6 +123,7 @@ const CalendarHeader = forwardRef((props: CalendarHeaderProps, ref) => {
     return numberOfDays && numberOfDays > 1;
   }, [numberOfDays]);
   const style = useRef(styleConstructor(theme));
+  const [pickerVisible, setPickerVisible] = useState(false);
   const headerStyle = useMemo(() => {
     return [style.current.header, numberOfDaysCondition ? style.current.partialHeader : undefined];
   }, [numberOfDaysCondition]);
@@ -200,6 +206,26 @@ const CalendarHeader = forwardRef((props: CalendarHeaderProps, ref) => {
     });
   }, [firstDay, current, numberOfDaysCondition, numberOfDays, disabledDaysIndexes]);
 
+  const handleOpenPicker = useCallback(() => {
+    setPickerVisible(true);
+  }, []);
+
+  const handleClosePicker = useCallback(() => {
+    setPickerVisible(false);
+  }, []);
+
+  const handleConfirmPicker = useCallback((monthIndex: number, year: number) => {
+    if (month && propsAddMonth) {
+      const currentYear = month.getFullYear();
+      const currentMonthIndex = month.getMonth();
+      const diff = (year - currentYear) * 12 + (monthIndex - currentMonthIndex);
+      if (diff !== 0) {
+        propsAddMonth(diff);
+      }
+    }
+    setPickerVisible(false);
+  }, [month, propsAddMonth]);
+
   const _renderHeader = () => {
     const webProps = Platform.OS === 'web' ? {'aria-level': webAriaLevel} : {};
 
@@ -211,16 +237,42 @@ const CalendarHeader = forwardRef((props: CalendarHeaderProps, ref) => {
       return customHeaderTitle;
     }
 
+    const allowTitlePress = !!props.titlePressOpensMonthYearPicker;
+    const showPickerButton = !!props.showPickerButton;
+
+    const TitleText = (
+      <Text
+        allowFontScaling={false}
+        style={style.current.monthText}
+        testID={`${testID}.title`}
+        {...webProps}
+      >
+        {formatNumbers(month?.toString(monthFormat))}
+      </Text>
+    );
+
+    const TitleContent = allowTitlePress ? (
+      <TouchableOpacity onPress={handleOpenPicker} activeOpacity={0.7}>
+        {TitleText}
+      </TouchableOpacity>
+    ) : (
+      TitleText
+    );
+
     return (
       <Fragment>
-        <Text
-          allowFontScaling={false}
-          style={style.current.monthText}
-          testID={`${testID}.title`}
-          {...webProps}
-        >
-          {formatNumbers(month?.toString(monthFormat))}
-        </Text>
+        {TitleContent}
+        {showPickerButton && (
+          <TouchableOpacity
+            onPress={handleOpenPicker}
+            accessibilityRole={'button'}
+            accessibilityLabel={'Open month and year picker'}
+            testID={`${testID}.openPickerButton`}
+            style={{alignSelf: 'center', paddingHorizontal: 6, paddingVertical: 4}}
+          >
+            <Text style={{fontSize: 16}}>📅</Text>
+          </TouchableOpacity>
+        )}
       </Fragment>
     );
   };
@@ -302,6 +354,12 @@ const CalendarHeader = forwardRef((props: CalendarHeaderProps, ref) => {
         {_renderArrow('right')}
       </View>
       {renderDayNames()}
+      <MonthYearPicker
+        visible={pickerVisible}
+        initialDate={month || new XDate()}
+        onClose={handleClosePicker}
+        onConfirm={handleConfirmPicker}
+      />
     </View>
   );
 });

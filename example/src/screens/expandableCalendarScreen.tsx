@@ -1,11 +1,13 @@
-import React, {useRef, useCallback} from 'react';
-import {Animated, Easing, StyleSheet, Text, TouchableOpacity} from 'react-native';
+import React, {useRef, useCallback, useState} from 'react';
+import {Animated, Easing, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import {ExpandableCalendar, AgendaList, CalendarProvider, WeekCalendar} from 'react-native-calendars';
 import testIDs from '../testIDs';
 import {agendaItems, getMarkedDates} from '../mocks/agendaItems';
 import AgendaItem from '../mocks/AgendaItem';
 import {getTheme, themeColor, lightThemeColor} from '../mocks/theme';
 import type XDate from 'xdate';
+const XDateClass = require('xdate');
+import MonthYearPicker from '../../../src/calendar/header/MonthYearPicker';
 
 const leftArrowIcon = require('../img/previous.png');
 const rightArrowIcon = require('../img/next.png');
@@ -48,6 +50,9 @@ const ExpandableCalendarScreen = (props: Props) => {
     }).start();
   }, []);
 
+  const [pickerVisible, setPickerVisible] = useState(false);
+  const [providerDate, setProviderDate] = useState(ITEMS[1]?.title);
+
   const renderHeader = useCallback(
     (date?: XDate) => {
       const rotationInDegrees = rotation.current.interpolate({
@@ -55,13 +60,24 @@ const ExpandableCalendarScreen = (props: Props) => {
         outputRange: ['0deg', '-180deg']
       });
       return (
-        <TouchableOpacity style={styles.header} onPress={toggleCalendarExpansion}>
-          <Text style={styles.headerTitle}>{date?.toString('MMMM yyyy')}</Text>
-          <Animated.Image source={CHEVRON} style={{transform: [{rotate: '90deg'}, {rotate: rotationInDegrees}]}}/>
-        </TouchableOpacity>
+        <View style={styles.header}>
+          <TouchableOpacity onPress={toggleCalendarExpansion} style={{flexDirection: 'row', alignItems: 'center'}}>
+            <Text style={styles.headerTitle}>{date?.toString('MMMM yyyy')}</Text>
+            <Animated.Image source={CHEVRON} style={{transform: [{rotate: '90deg'}, {rotate: rotationInDegrees}]}}/>
+          </TouchableOpacity>
+          <TouchableOpacity
+            accessibilityRole="button"
+            accessibilityLabel="Open month and year picker"
+            testID={`${testIDs.expandableCalendar.CONTAINER}.openPickerButton`}
+            onPress={() => setPickerVisible(true)}
+            style={{paddingHorizontal: 6, paddingVertical: 4, marginLeft: 6}}
+          >
+            <Text style={{fontSize: 16, marginLeft: 10}}>📅</Text>
+          </TouchableOpacity>
+        </View>
       );
     },
-    [toggleCalendarExpansion]
+    [toggleCalendarExpansion, pickerVisible, providerDate]
   );
 
   const onCalendarToggled = useCallback(
@@ -73,7 +89,7 @@ const ExpandableCalendarScreen = (props: Props) => {
 
   return (
     <CalendarProvider
-      date={ITEMS[1]?.title}
+      date={providerDate}
       // onDateChanged={onDateChanged}
       // onMonthChange={onMonthChange}
       showTodayButton
@@ -114,6 +130,17 @@ const ExpandableCalendarScreen = (props: Props) => {
         // scrollToNextEvent
         sectionStyle={styles.section}
         // dayFormat={'yyyy-MM-d'}
+      />
+      <MonthYearPicker
+        visible={pickerVisible}
+        initialDate={new XDateClass(providerDate)}
+        onClose={() => setPickerVisible(false)}
+        onConfirm={(monthIndex: number, year: number) => {
+          const month = (monthIndex + 1).toString().padStart(2, '0');
+          const newDateString = `${year}-${month}-01`;
+          setPickerVisible(false);
+          setProviderDate(newDateString);
+        }}
       />
     </CalendarProvider>
   );

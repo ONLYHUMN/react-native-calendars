@@ -17,7 +17,7 @@
     "lint": "eslint src/ example/src --ext .tsx,.ts,.js",
     "release": "node ./scripts/release.js",
     "start": "react-native start",
-    "ios": "react-native run-ios",
+    "ios": "react-native run-ios --simulator='iPhone 16'",
     "android": "react-native run-android",
     "xcode": "open ios/CalendarsExample.xcworkspace/",
     "clean": "rm yarn-lock && rm -rf ./node_modules && yarn",
