@@ -87,6 +87,7 @@ const CalendarList = (props, ref) => {
     useEffect(() => {
         if (current) {
             scrollToMonth(new XDate(current));
+            setCurrentMonth(parseDate(current));
         }
     }, [current]);
     useDidUpdate(() => {
